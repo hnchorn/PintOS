@@ -352,6 +352,13 @@ void
 thread_yield (void) 
 {
   struct thread *cur = thread_current ();
+  //Begin Project 2 code
+  #ifdef USERPROG  
+  /* Activate the new address space. */  
+  if (cur->pagedir == NULL)  
+    return;  
+  #endif
+  //End Project 2 code
   enum intr_level old_level;
   
   ASSERT (!intr_context ());
@@ -538,6 +545,10 @@ is_thread (struct thread *t)
 static void
 init_thread (struct thread *t, const char *name, int priority)
 {
+  //Begin Project 2 code
+  enum intr_level old_level;
+  //End Project 2 code
+
   ASSERT (t != NULL);
   ASSERT (PRI_MIN <= priority && priority <= PRI_MAX);
   ASSERT (name != NULL);
@@ -549,6 +560,15 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
   t->magic = THREAD_MAGIC;
 
+  //Begin Project 2 code
+  #ifdef USERPROG
+  t->tcb=NULL;
+  t->current_file=NULL;
+  list_init(&t->child_tcb);
+  list_init(&t->fd);
+  #endif
+  //End Project 2 code
+
   //Begin Project 1 code - Priority Scheduling
    /* Initialize the values that used in priority scheduling.
    */
@@ -556,8 +576,14 @@ init_thread (struct thread *t, const char *name, int priority)
   list_init(&t -> donation_list);
   t -> init_priority = priority;
 
+  //Begin Project 2 code
+  old_level = intr_disable ();
+  //End Project 2 code
   list_push_back(&all_list, &t -> allelem);
   //End Project 1 code
+  //Begin Project 2 code
+  intr_set_level (old_level);
+  //End Project 2 code
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and

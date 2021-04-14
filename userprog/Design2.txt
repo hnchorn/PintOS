@@ -8,19 +8,16 @@
 
 >> Fill in the names of your group members.
 
-- Hannah Chorn <hnchorn@ksu.edu>
-- Siddharth Yadav <siddharthy1999@ksu.edu>
+		- Hannah Chorn <hnchorn@ksu.edu>
+		- Siddharth Yadav <siddharthy1999@ksu.edu>
 
 ---- PRELIMINARIES ----
-
->> If you have any preliminary comments on your submission, notes for the
->> TAs, or extra credit, please give them here.
 
 >> Please cite any offline or online sources you consulted while
 >> preparing your submission, other than the Pintos documentation, course
 >> text, lecture notes, and course staff.
 
-- 
+		- 
 
 
 			   ARGUMENT PASSING
@@ -32,7 +29,14 @@
 >> `struct' member, global or static variable, `typedef', or
 >> enumeration.  Identify the purpose of each in 25 words or less.
 
--
+		struct tcb *tcb
+			- Thread control block to allow for easier thread management and manipulation
+        struct list child_tcb
+			- List of thread control block children
+        struct list fd
+			- List of file descriptors for handling the opening of files
+        struct file *current_file
+			- Pointer used to indicate the current file
 
 ---- ALGORITHMS ----
 
@@ -40,19 +44,33 @@
 >> you arrange for the elements of argv[] to be in the right order?
 >> How do you avoid overflowing the stack page?
 
--
+		- strtok_r() is used in a for loop over delimiter space " " until it
+		returns NULL. These separated tokens are then stored into an array and argc 
+		is increased. The stack size is increased to incorporate additions, then the tokens 
+		are pushed onto the stack in reverse order (begin at argc-1 until 0), allowing the 
+		elements of argv[] to be arranged in proper order. Overflow is avoided on the stack
+		page by comparing the total size of the arguments being passed. If it is larger
+		than the stack page size, the system exits.
 
 ---- RATIONALE ----
 
 >> A3: Why does Pintos implement strtok_r() but not strtok()?
 
--
+		- strtok_r() is more threadsafe and better at preventing race conditions.
+		Since it can be reentered, strtok_r() saves the tokenizing pointer
+		of the current running thread so if another thread calls the function,
+		the original thread is able to pick up where it left off.
+  
 
 >> A4: In Pintos, the kernel separates commands into an executable name
 >> and arguments.  In Unix-like systems, the shell does this
 >> separation.  Identify at least two advantages of the Unix approach.
 
--
+		- The Unix approach prevents bad arguments from being passed to the kernel, 
+		allowing the shell to crash instead of causing deeper kernel issues. 
+		Letting the shell handle argument parsing also minimizes the program
+		time in the kernel and provides the kernel with one less operation to
+		worry about.
 
 
 			     SYSTEM CALLS
@@ -64,20 +82,29 @@
 >> `struct' member, global or static variable, `typedef', or
 >> enumeration.  Identify the purpose of each in 25 words or less.
 
--
+		(Same as Argument Passing)
+
+		struct tcb *tcb
+			- Thread control block to allow for easier thread management and manipulation
+        struct list child_tcb
+			- List of thread control block children
+        struct list fd
+			- List of file descriptors for handling the opening of files
+        struct file *current_file
+			- Pointer used to indicate the current file
 
 >> B2: Describe how file descriptors are associated with open files.
 >> Are file descriptors unique within the entire OS or just within a
 >> single process?
 
--
+		-
 
 ---- ALGORITHMS ----
 
 >> B3: Describe your code for reading and writing user data from the
 >> kernel.
 
--
+		-
 
 >> B4: Suppose a system call causes a full page (4,096 bytes) of data
 >> to be copied from user space into the kernel.  What is the least
@@ -86,12 +113,12 @@
 >> for a system call that only copies 2 bytes of data?  Is there room
 >> for improvement in these numbers, and how much?
 
--
+		-
 
 >> B5: Briefly describe your implementation of the "wait" system call
 >> and how it interacts with process termination.
 
--
+		-
 
 >> B6: Any access to user program memory at a user-specified address
 >> can fail due to a bad pointer value.  Such accesses must cause the
@@ -107,7 +134,7 @@
 >> paragraphs, describe the strategy or strategies you adopted for
 >> managing these issues.  Give an example.
 
--
+		-
 
 ---- SYNCHRONIZATION ----
 
@@ -116,7 +143,7 @@
 >> loading.  How does your code ensure this?  How is the load
 >> success/failure status passed back to the thread that calls "exec"?
 
--
+		-
 
 >> B8: Consider parent process P with child process C.  How do you
 >> ensure proper synchronization and avoid race conditions when P
@@ -125,21 +152,21 @@
 >> terminates without waiting, before C exits?  After C exits?  Are
 >> there any special cases?
 
--
+		-
 
 ---- RATIONALE ----
 
 >> B9: Why did you choose to implement access to user memory from the
 >> kernel in the way that you did?
 
--
+		-
 
 >> B10: What advantages or disadvantages can you see to your design
 >> for file descriptors?
 
--
+		-
 
 >> B11: The default tid_t to pid_t mapping is the identity mapping.
 >> If you changed it, what advantages are there to your approach?
 
--
+		-

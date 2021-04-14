@@ -4,6 +4,10 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+#include "threads/synch.h"
+#include "filesys/file.h"
+#include "lib/kernel/hash.h"
+#include "vm/page.h"
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -16,6 +20,7 @@ enum thread_status
 
 /* Thread identifier type.
    You can redefine this to whatever type you like. */
+typedef int mapid_t;
 typedef int tid_t;
 #define TID_ERROR ((tid_t) -1)          /* Error value for tid_t. */
 
@@ -107,11 +112,46 @@ struct thread
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
+    //Begin Project 2 code
+    struct tcb *tcb;
+    struct list child_tcb;
+    struct list fd;
+    struct file *current_file;
+    //End Project 2 code
 #endif
 
-    /* Owned by thread.c. */
-    unsigned magic;                     /* Detects stack overflow. */
-  };
+//Begin Project 2 code
+/* Thread Control Block Structure */
+  struct tcb
+   {
+   tid_t tid;
+   bool exit;
+   bool wait;
+   bool goa;
+   int exit_code;
+   char * argv;
+   char * prog;
+   struct thread * me;
+   struct thread * parent;
+   struct list_elem elem;
+   struct semaphore sema;
+   struct semaphore wait_sema;
+   };
+
+   struct list all_list;
+
+   struct filedescriptor
+   {
+   int fd_num;
+   struct file * f;
+   struct thread * master;
+   struct list_elem elem;
+   };
+   //End Project 2 code
+   
+/* Owned by thread.c. */
+unsigned magic;                     /* Detects stack overflow. */
+};
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
